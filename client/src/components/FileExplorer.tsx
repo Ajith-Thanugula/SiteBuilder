@@ -22,38 +22,73 @@ export default function FileExplorer() {
     queryKey: ['/api/projects'],
   });
 
-  const currentProject = projects.find(p => p.id) || projects[0];
+  // Get the most recently created project (your uploaded NextJS project)
+  const currentProject = projects.length > 1 
+    ? projects[projects.length - 1] // Most recent project
+    : projects[0]; // Fallback to first if only one
   
   // Parse codebase into file structure - this will show your real uploaded files!
   const parseCodebase = (codebase: any): FileNode[] => {
     if (!codebase) return getDefaultFileStructure();
     
     try {
-      // If codebase is a string containing file contents, extract file paths
+      // Handle different codebase formats
+      if (typeof codebase === 'object' && codebase.files) {
+        // If codebase has a files property, use it directly
+        return buildFileTree(Object.keys(codebase.files));
+      }
+      
       if (typeof codebase === 'string') {
-        const lines = codebase.split('\n').filter(line => line.trim());
         const files = new Set<string>();
+        const lines = codebase.split('\n').filter(line => line.trim());
         
-        // Look for file paths in the content
         lines.forEach(line => {
-          // Common file patterns
-          const fileMatches = line.match(/[\w-./]+\.(tsx?|jsx?|css|json|md|html|svg|ico|js|ts)/g);
-          if (fileMatches) {
-            fileMatches.forEach(match => files.add(match));
-          }
+          // Look for file paths - common Next.js/React patterns
+          const patterns = [
+            // File extensions
+            /[\w\-\.\/]+\.(tsx?|jsx?|css|scss|json|md|html|svg|ico|png|jpg|jpeg|gif|js|ts|mjs|cjs)/gi,
+            // Next.js specific patterns
+            /pages\/[\w\-\.\/]+/gi,
+            /components\/[\w\-\.\/]+/gi,
+            /app\/[\w\-\.\/]+/gi,
+            /src\/[\w\-\.\/]+/gi,
+            /public\/[\w\-\.\/]+/gi,
+            // Import patterns
+            /from\s+['"]([^'"]+)['"]/gi,
+            /import\s+['"]([^'"]+)['"]/gi,
+          ];
           
-          // Import/export patterns
-          const importMatch = line.match(/from ['"]([^'"]+)['"]/);
-          if (importMatch) {
-            files.add(importMatch[1] + '.tsx');
-          }
+          patterns.forEach(pattern => {
+            const matches = line.match(pattern);
+            if (matches) {
+              matches.forEach(match => {
+                let fileName = match;
+                if (fileName.startsWith('from ') || fileName.startsWith('import ')) {
+                  fileName = fileName.replace(/^(from|import)\s+['"]/, '').replace(/['"]$/, '');
+                  if (!fileName.includes('.')) {
+                    fileName += '.tsx'; // Assume React component
+                  }
+                }
+                if (fileName.includes('/') || fileName.includes('.')) {
+                  files.add(fileName.replace(/^\.\//, '')); // Remove ./ prefix
+                }
+              });
+            }
+          });
         });
         
-        // Add common project files if they exist in content
-        if (codebase.includes('package.json')) files.add('package.json');
-        if (codebase.includes('tsconfig')) files.add('tsconfig.json');
+        // Add common Next.js/React project files based on content
+        if (codebase.includes('"next"') || codebase.includes('next.config')) {
+          files.add('next.config.js');
+          files.add('pages/_app.tsx');
+          files.add('pages/index.tsx');
+        }
+        if (codebase.includes('package.json') || codebase.includes('"name"')) files.add('package.json');
+        if (codebase.includes('tsconfig') || codebase.includes('typescript')) files.add('tsconfig.json');
         if (codebase.includes('tailwind')) files.add('tailwind.config.js');
+        if (codebase.includes('README')) files.add('README.md');
         
+        console.log('Parsed files from codebase:', Array.from(files));
         return buildFileTree(Array.from(files));
       }
       
