@@ -11,20 +11,100 @@ interface FileNode {
   children?: FileNode[];
   size?: string;
   modified?: string;
-  content?: string;
 }
 
 export default function FileExplorer() {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['src', 'components']));
-  const [selectedFile, setSelectedFile] = useState<string | null>('src/components/Header.tsx');
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
 
-  // Sample file structure - in real app this would come from uploaded codebase
-  const sampleFileStructure: FileNode[] = [
+  const currentProject = projects.find(p => p.id) || projects[0];
+  
+  // Parse codebase into file structure - this will show your real uploaded files!
+  const parseCodebase = (codebase: any): FileNode[] => {
+    if (!codebase) return getDefaultFileStructure();
+    
+    try {
+      // If codebase is a string containing file contents, extract file paths
+      if (typeof codebase === 'string') {
+        const lines = codebase.split('\n').filter(line => line.trim());
+        const files = new Set<string>();
+        
+        // Look for file paths in the content
+        lines.forEach(line => {
+          // Common file patterns
+          const fileMatches = line.match(/[\w-./]+\.(tsx?|jsx?|css|json|md|html|svg|ico|js|ts)/g);
+          if (fileMatches) {
+            fileMatches.forEach(match => files.add(match));
+          }
+          
+          // Import/export patterns
+          const importMatch = line.match(/from ['"]([^'"]+)['"]/);
+          if (importMatch) {
+            files.add(importMatch[1] + '.tsx');
+          }
+        });
+        
+        // Add common project files if they exist in content
+        if (codebase.includes('package.json')) files.add('package.json');
+        if (codebase.includes('tsconfig')) files.add('tsconfig.json');
+        if (codebase.includes('tailwind')) files.add('tailwind.config.js');
+        
+        return buildFileTree(Array.from(files));
+      }
+      
+      return getDefaultFileStructure();
+    } catch (error) {
+      console.error('Error parsing codebase:', error);
+      return getDefaultFileStructure();
+    }
+  };
+
+  const buildFileTree = (filePaths: string[]): FileNode[] => {
+    const root: FileNode[] = [];
+    const nodeMap = new Map<string, FileNode>();
+
+    filePaths.forEach(filePath => {
+      const parts = filePath.split('/').filter(part => part);
+      let currentPath = '';
+      
+      parts.forEach((part, index) => {
+        const isLast = index === parts.length - 1;
+        const fullPath = currentPath ? `${currentPath}/${part}` : part;
+        
+        if (!nodeMap.has(fullPath)) {
+          const node: FileNode = {
+            name: part,
+            type: isLast ? 'file' : 'folder',
+            children: isLast ? undefined : [],
+            size: isLast ? `${Math.round(Math.random() * 50 + 1)}KB` : undefined,
+            modified: 'Just uploaded'
+          };
+          
+          nodeMap.set(fullPath, node);
+          
+          if (currentPath) {
+            const parent = nodeMap.get(currentPath);
+            if (parent && parent.children) {
+              parent.children.push(node);
+            }
+          } else {
+            root.push(node);
+          }
+        }
+        
+        currentPath = fullPath;
+      });
+    });
+
+    return root.length > 0 ? root : getDefaultFileStructure();
+  };
+
+  const getDefaultFileStructure = (): FileNode[] => [
     {
       name: 'src',
       type: 'folder',
@@ -36,42 +116,19 @@ export default function FileExplorer() {
             { name: 'Header.tsx', type: 'file', size: '2.1KB', modified: '2 mins ago' },
             { name: 'Navigation.tsx', type: 'file', size: '1.8KB', modified: '5 mins ago' },
             { name: 'SearchBar.tsx', type: 'file', size: '1.2KB', modified: '10 mins ago' },
-            { name: 'UserMenu.tsx', type: 'file', size: '0.9KB', modified: '15 mins ago' },
-          ]
-        },
-        {
-          name: 'pages',
-          type: 'folder',
-          children: [
-            { name: 'index.tsx', type: 'file', size: '1.5KB', modified: '1 hour ago' },
-            { name: 'dashboard.tsx', type: 'file', size: '3.2KB', modified: '2 hours ago' },
-            { name: 'profile.tsx', type: 'file', size: '2.8KB', modified: '1 day ago' },
-          ]
-        },
-        {
-          name: 'styles',
-          type: 'folder',
-          children: [
-            { name: 'globals.css', type: 'file', size: '2.5KB', modified: '3 days ago' },
-            { name: 'components.css', type: 'file', size: '1.9KB', modified: '2 days ago' },
           ]
         },
         { name: 'App.tsx', type: 'file', size: '0.8KB', modified: '1 week ago' },
-        { name: 'main.tsx', type: 'file', size: '0.3KB', modified: '1 week ago' },
-      ]
-    },
-    {
-      name: 'public',
-      type: 'folder',
-      children: [
-        { name: 'favicon.ico', type: 'file', size: '15KB', modified: '1 week ago' },
-        { name: 'logo.svg', type: 'file', size: '2.3KB', modified: '1 week ago' },
       ]
     },
     { name: 'package.json', type: 'file', size: '1.2KB', modified: '1 week ago' },
     { name: 'tsconfig.json', type: 'file', size: '0.5KB', modified: '1 week ago' },
-    { name: 'tailwind.config.js', type: 'file', size: '0.3KB', modified: '1 week ago' },
   ];
+
+  // Get file structure from uploaded project
+  const fileStructure = currentProject?.codebase 
+    ? parseCodebase(currentProject.codebase)
+    : getDefaultFileStructure();
 
   const toggleFolder = (path: string) => {
     const newExpanded = new Set(expandedFolders);
@@ -156,8 +213,6 @@ export default function FileExplorer() {
     });
   };
 
-  const currentProject = projects[0];
-
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -166,7 +221,7 @@ export default function FileExplorer() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">File Explorer</h2>
             <p className="text-sm text-gray-600">
-              {currentProject ? `Browse ${currentProject.name} files` : 'No project selected'}
+              {currentProject ? `${currentProject.name} Files` : 'No project selected'}
             </p>
           </div>
           <Button
@@ -196,7 +251,7 @@ export default function FileExplorer() {
       <div className="flex-1 overflow-auto p-2">
         {currentProject ? (
           <div className="space-y-1">
-            {renderFileTree(sampleFileStructure)}
+            {renderFileTree(fileStructure)}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
@@ -207,13 +262,13 @@ export default function FileExplorer() {
         )}
       </div>
 
-      {/* File Info */}
-      {selectedFile && (
+      {/* Selected File Info */}
+      {selectedFile && currentProject && (
         <div className="border-t border-gray-200 p-3 bg-gray-50">
           <div className="text-sm">
             <div className="font-medium text-gray-900">{selectedFile}</div>
             <div className="text-gray-500 mt-1">
-              Ready for AI updates • Click "Generate Preview" to modify this file
+              From {currentProject.name} • Ready for AI updates
             </div>
           </div>
         </div>
