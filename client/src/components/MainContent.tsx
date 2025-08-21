@@ -1,6 +1,9 @@
 import { useState } from "react";
 import DesignInput from "@/components/DesignInput";
 import AIChat from "@/components/AIChat";
+import CodePreview from "@/components/CodePreview";
+import LivePreview from "@/components/LivePreview";
+import FileExplorer from "@/components/FileExplorer";
 import { Button } from "@/components/ui/button";
 
 export default function MainContent() {
@@ -42,24 +45,9 @@ export default function MainContent() {
             {/* Left Panel - Input Section */}
             <div className="w-1/2 border-r border-gray-200 bg-white flex flex-col">
               {activeTab === 'design' && <DesignInput />}
-              {activeTab === 'code' && (
-                <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Code Preview</h2>
-                  <p className="text-sm text-gray-600">Generated code will appear here.</p>
-                </div>
-              )}
-              {activeTab === 'preview' && (
-                <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Live Preview</h2>
-                  <p className="text-sm text-gray-600">Component preview will appear here.</p>
-                </div>
-              )}
-              {activeTab === 'files' && (
-                <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">File Explorer</h2>
-                  <p className="text-sm text-gray-600">Project files will appear here.</p>
-                </div>
-              )}
+              {activeTab === 'code' && <CodePreview />}
+              {activeTab === 'preview' && <LivePreview />}
+              {activeTab === 'files' && <FileExplorer />}
             </div>
 
             {/* Right Panel - AI Interaction */}
