@@ -88,6 +88,7 @@ export default function FileExplorer() {
         if (codebase.includes('tailwind')) files.add('tailwind.config.js');
         if (codebase.includes('README')) files.add('README.md');
         
+        console.log('Codebase content preview:', codebase.substring(0, 500));
         console.log('Parsed files from codebase:', Array.from(files));
         return buildFileTree(Array.from(files));
       }
