@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Using GPT-4o mini for cost-effective component analysis and code generation
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
 });
@@ -35,7 +35,7 @@ export interface CodeGenerationResponse {
 export async function analyzeCodebase(codebase: string): Promise<ComponentAnalysis> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -110,7 +110,7 @@ Target Components: ${request.targetComponents.join(', ')}
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages,
       response_format: { type: "json_object" },
       max_tokens: 4000,
@@ -143,7 +143,7 @@ export async function chatWithAI(messages: ChatMessage[], context?: string): Pro
     ];
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: openaiMessages,
       max_tokens: 1000,
     });
@@ -157,7 +157,7 @@ export async function chatWithAI(messages: ChatMessage[], context?: string): Pro
 export async function analyzeDesignImage(base64Image: string): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
