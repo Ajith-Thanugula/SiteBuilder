@@ -40,53 +40,80 @@ export default function FileExplorer() {
       
       if (typeof codebase === 'string') {
         const files = new Set<string>();
-        const lines = codebase.split('\n').filter(line => line.trim());
+        
+        // Parse ZIP file content - look for file paths in various formats
+        const lines = codebase.split('\n');
         
         lines.forEach(line => {
-          // Look for file paths - common Next.js/React patterns
+          line = line.trim();
+          if (!line) return;
+          
+          // Look for file paths that contain common file extensions
+          const fileExtensions = /\.(tsx?|jsx?|js|ts|css|scss|json|md|html|svg|ico|png|jpg|jpeg|gif|webp|woff2?|ttf|otf|eot|xml|yml|yaml|gitignore|env|lock)$/i;
+          
+          // Check if line looks like a file path
+          if (fileExtensions.test(line)) {
+            // Clean up the path
+            let filePath = line
+              .replace(/^[^\w\/\-\.]*/, '') // Remove leading non-path characters
+              .replace(/[^\w\/\-\.]*$/, '') // Remove trailing non-path characters
+              .replace(/\\/g, '/') // Convert backslashes to forward slashes
+              .replace(/^\/+/, ''); // Remove leading slashes
+            
+            if (filePath && (filePath.includes('/') || filePath.includes('.'))) {
+              files.add(filePath);
+            }
+          }
+          
+          // Also look for common Next.js/React patterns in the content
           const patterns = [
-            // File extensions
-            /[\w\-\.\/]+\.(tsx?|jsx?|css|scss|json|md|html|svg|ico|png|jpg|jpeg|gif|js|ts|mjs|cjs)/gi,
-            // Next.js specific patterns
-            /pages\/[\w\-\.\/]+/gi,
-            /components\/[\w\-\.\/]+/gi,
-            /app\/[\w\-\.\/]+/gi,
-            /src\/[\w\-\.\/]+/gi,
-            /public\/[\w\-\.\/]+/gi,
-            // Import patterns
-            /from\s+['"]([^'"]+)['"]/gi,
-            /import\s+['"]([^'"]+)['"]/gi,
+            // Import/export statements
+            /(?:from|import)\s+['"]([^'"]+)['"].*\.(tsx?|jsx?)$/i,
+            // File references in comments or strings
+            /['"`]([^'"`]*\.(tsx?|jsx?|css|js|json))['"`]/g,
+            // Next.js page routes
+            /pages\/[^'"`,\s]+\.(tsx?|jsx?|js)/gi,
+            // Component paths
+            /components\/[^'"`,\s]+\.(tsx?|jsx?|js)/gi,
           ];
           
           patterns.forEach(pattern => {
-            const matches = line.match(pattern);
-            if (matches) {
-              matches.forEach(match => {
-                let fileName = match;
-                if (fileName.startsWith('from ') || fileName.startsWith('import ')) {
-                  fileName = fileName.replace(/^(from|import)\s+['"]/, '').replace(/['"]$/, '');
-                  if (!fileName.includes('.')) {
-                    fileName += '.tsx'; // Assume React component
-                  }
+            const matches = line.matchAll(pattern);
+            for (const match of matches) {
+              let filePath = match[1] || match[0];
+              if (filePath && !filePath.startsWith('http') && !filePath.startsWith('//')) {
+                filePath = filePath.replace(/^\.\//, '').replace(/\\/g, '/');
+                if (filePath.includes('.') || filePath.includes('/')) {
+                  files.add(filePath);
                 }
-                if (fileName.includes('/') || fileName.includes('.')) {
-                  files.add(fileName.replace(/^\.\//, '')); // Remove ./ prefix
-                }
-              });
+              }
             }
           });
         });
         
-        // Add common Next.js/React project files based on content
-        if (codebase.includes('"next"') || codebase.includes('next.config')) {
-          files.add('next.config.js');
-          files.add('pages/_app.tsx');
-          files.add('pages/index.tsx');
+        // Add common project files if found in content
+        if (codebase.includes('package.json') || codebase.includes('"name"')) {
+          files.add('package.json');
         }
-        if (codebase.includes('package.json') || codebase.includes('"name"')) files.add('package.json');
-        if (codebase.includes('tsconfig') || codebase.includes('typescript')) files.add('tsconfig.json');
-        if (codebase.includes('tailwind')) files.add('tailwind.config.js');
-        if (codebase.includes('README')) files.add('README.md');
+        if (codebase.includes('tsconfig') || codebase.includes('typescript')) {
+          files.add('tsconfig.json');
+        }
+        if (codebase.includes('next.config') || codebase.includes('"next"')) {
+          files.add('next.config.js');
+        }
+        if (codebase.includes('tailwind.config') || codebase.includes('tailwindcss')) {
+          files.add('tailwind.config.js');
+        }
+        if (codebase.includes('README')) {
+          files.add('README.md');
+        }
+        
+        // Add typical Next.js structure if it's detected
+        if (codebase.includes('pages/') || codebase.includes('"next"')) {
+          files.add('pages/index.tsx');
+          files.add('pages/_app.tsx');
+          files.add('pages/_document.tsx');
+        }
         
         console.log('Codebase content preview:', codebase.substring(0, 500));
         console.log('Parsed files from codebase:', Array.from(files));
