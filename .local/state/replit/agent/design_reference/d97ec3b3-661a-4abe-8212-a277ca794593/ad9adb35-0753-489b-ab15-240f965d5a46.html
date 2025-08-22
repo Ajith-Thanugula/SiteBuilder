@@ -1,0 +1,594 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCraft AI - Build Websites with AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#3B82F6',
+                        'secondary': '#6366F1',
+                        'accent': '#10B981',
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-inter">
+    <!-- @COMPONENT: AppLayout -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <!-- @COMPONENT: Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-magic text-2xl text-primary"></i>
+                    <h1 class="text-xl font-bold text-gray-900">WebCraft AI</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-2 text-sm text-gray-500">
+                    <span data-bind="project.name">My Website Project</span>
+                    <i class="fas fa-circle text-xs text-green-500"></i>
+                    <span>Auto-saved</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button data-event="click:handleExport" class="hidden sm:flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-download"></i>
+                    <span>Export</span>
+                </button>
+                <button data-event="click:handleDeploy" class="hidden sm:flex items-center space-x-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-emerald-600 transition-colors">
+                    <i class="fas fa-rocket"></i>
+                    <span>Deploy</span>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-gray-600"></i>
+                    </div>
+                    <span class="hidden md:block text-sm font-medium text-gray-700" data-bind="user.name">John Doe</span>
+                </div>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: Header -->
+
+        <!-- Main Content -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Sidebar -->
+            <!-- @COMPONENT: Sidebar -->
+            <aside class="w-80 bg-white border-r border-gray-200 flex flex-col">
+                <!-- Project Info -->
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2">Current Project</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Type:</span>
+                            <span data-bind="project.type" class="font-medium">Landing Page</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Status:</span>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">In Progress</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Last Updated:</span>
+                            <span data-bind="project.lastUpdated" class="text-gray-700">2 mins ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Version History -->
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-md font-medium text-gray-900 mb-3">Version History</h3>
+                    <div class="space-y-2">
+                        <!-- @MAP: versions.map(version => ( -->
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" data-event="click:loadVersion">
+                            <div class="w-2 h-2 bg-primary rounded-full"></div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium text-gray-900" data-bind="version.name">v1.3 - Hero section update</div>
+                                <div class="text-xs text-gray-500" data-bind="version.timestamp">10 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" data-event="click:loadVersion">
+                            <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium text-gray-900" data-bind="version.name">v1.2 - Added contact form</div>
+                                <div class="text-xs text-gray-500" data-bind="version.timestamp">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" data-event="click:loadVersion">
+                            <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium text-gray-900" data-bind="version.name">v1.1 - Initial design</div>
+                                <div class="text-xs text-gray-500" data-bind="version.timestamp">2 hours ago</div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="p-6">
+                    <h3 class="text-md font-medium text-gray-900 mb-3">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button data-event="click:newProject" class="w-full flex items-center space-x-2 p-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-plus text-gray-400"></i>
+                            <span>New Project</span>
+                        </button>
+                        <button data-event="click:importDesign" class="w-full flex items-center space-x-2 p-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-upload text-gray-400"></i>
+                            <span>Import Figma Design</span>
+                        </button>
+                        <button data-event="click:viewCode" class="w-full flex items-center space-x-2 p-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-code text-gray-400"></i>
+                            <span>View Full Code</span>
+                        </button>
+                        <button data-event="click:shareProject" class="w-full flex items-center space-x-2 p-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-share text-gray-400"></i>
+                            <span>Share Project</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+            <!-- @END_COMPONENT: Sidebar -->
+
+            <!-- Main Panel -->
+            <div class="flex-1 flex flex-col lg:flex-row">
+                <!-- Chat Interface -->
+                <!-- @COMPONENT: ChatInterface -->
+                <div class="flex-1 flex flex-col bg-white border-r border-gray-200">
+                    <!-- Chat Header -->
+                    <div class="p-4 border-b border-gray-200 bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-semibold text-gray-900">AI Assistant</h2>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-sm text-gray-600">Online</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">Describe your website and I'll build it for you</p>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <!-- @STATE: messages:array = [] -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                        <!-- AI Message -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-robot text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="bg-gray-100 rounded-lg p-3 max-w-lg">
+                                    <p class="text-sm text-gray-800" data-mock="true">
+                                        Hi! I'm your AI web development assistant. I can help you build any type of website just by describing what you want. You can also upload Figma designs or screenshots for reference. What would you like to create today?
+                                    </p>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-1 block">AI Assistant • 2:34 PM</span>
+                            </div>
+                        </div>
+
+                        <!-- User Message -->
+                        <div class="flex items-start space-x-3 justify-end">
+                            <div class="flex-1">
+                                <div class="bg-primary rounded-lg p-3 max-w-lg ml-auto">
+                                    <p class="text-sm text-white" data-mock="true">
+                                        I want to create a landing page for my SaaS product. It should have a modern design with a hero section, features overview, pricing table, and testimonials. The color scheme should be blue and white.
+                                    </p>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-1 block text-right">You • 2:35 PM</span>
+                            </div>
+                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-gray-600 text-sm"></i>
+                            </div>
+                        </div>
+
+                        <!-- AI Response with Code Generation -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-robot text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="bg-gray-100 rounded-lg p-3 max-w-lg">
+                                    <p class="text-sm text-gray-800 mb-2" data-mock="true">
+                                        Perfect! I'll create a modern SaaS landing page for you. Let me ask a few quick questions to make it exactly what you need:
+                                    </p>
+                                    <ul class="text-sm text-gray-800 space-y-1 mb-2" data-mock="true">
+                                        <li>• What's your SaaS product name?</li>
+                                        <li>• What problem does it solve?</li>
+                                        <li>• Do you have any specific features to highlight?</li>
+                                        <li>• What pricing tiers do you offer?</li>
+                                    </ul>
+                                    <p class="text-sm text-gray-800" data-mock="true">
+                                        Meanwhile, I'll start building the basic structure. You can see the preview updating in real-time!
+                                    </p>
+                                </div>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Generated HTML structure
+                                    </div>
+                                    <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                                        Adding CSS styles...
+                                    </div>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-1 block">AI Assistant • 2:36 PM</span>
+                            </div>
+                        </div>
+
+                        <!-- User Follow-up -->
+                        <div class="flex items-start space-x-3 justify-end">
+                            <div class="flex-1">
+                                <div class="bg-primary rounded-lg p-3 max-w-lg ml-auto">
+                                    <p class="text-sm text-white" data-mock="true">
+                                        The product is called "TaskFlow" - it's a project management tool for remote teams. Key features are real-time collaboration, automated workflows, and analytics dashboard. We have Free, Pro ($29/mo), and Enterprise ($99/mo) plans.
+                                    </p>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-1 block text-right">You • 2:37 PM</span>
+                            </div>
+                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-gray-600 text-sm"></i>
+                            </div>
+                        </div>
+
+                        <!-- Loading Message -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-robot text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="bg-gray-100 rounded-lg p-3 max-w-lg">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="flex space-x-1">
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                                        </div>
+                                        <span class="text-sm text-gray-600">Updating your TaskFlow landing page...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="p-4 border-t border-gray-200 bg-white">
+                        <div class="flex items-center space-x-3">
+                            <button data-event="click:attachFile" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <div class="flex-1 relative">
+                                <input 
+                                    type="text" 
+                                    placeholder="Describe changes or ask questions..." 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    data-event="keypress:handleEnter"
+                                    data-mock="true"
+                                />
+                                <button data-event="click:sendMessage" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-primary hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-2 space-x-4 text-xs text-gray-500">
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-upload"></i>
+                                <span>Upload images or Figma files</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i class="fas fa-magic"></i>
+                                <span>Press Enter to send</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ChatInterface -->
+
+                <!-- Preview Panel -->
+                <!-- @COMPONENT: PreviewPanel -->
+                <div class="flex-1 flex flex-col bg-gray-100">
+                    <!-- Preview Header -->
+                    <div class="p-4 bg-white border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-semibold text-gray-900">Live Preview</h2>
+                            <div class="flex items-center space-x-2">
+                                <!-- Device Toggle -->
+                                <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                                    <button data-event="click:setDevice:desktop" class="px-3 py-1 text-sm bg-white rounded shadow-sm text-gray-700">
+                                        <i class="fas fa-desktop"></i>
+                                    </button>
+                                    <button data-event="click:setDevice:tablet" class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800">
+                                        <i class="fas fa-tablet-alt"></i>
+                                    </button>
+                                    <button data-event="click:setDevice:mobile" class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </button>
+                                </div>
+                                <button data-event="click:openInNewTab" class="p-2 text-gray-600 hover:text-gray-800 transition-colors">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-2 space-x-4 text-sm text-gray-600">
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span>Live updating</span>
+                            </div>
+                            <span data-bind="preview.url">localhost:3000</span>
+                        </div>
+                    </div>
+
+                    <!-- Preview Content -->
+                    <div class="flex-1 p-4">
+                        <div class="w-full h-full bg-white rounded-lg shadow-lg overflow-hidden">
+                            <!-- Mock Website Preview -->
+                            <div class="h-full overflow-y-auto">
+                                <!-- Hero Section Preview -->
+                                <div class="bg-gradient-to-br from-blue-50 to-white px-8 py-12">
+                                    <div class="max-w-6xl mx-auto">
+                                        <nav class="flex items-center justify-between mb-12">
+                                            <div class="text-2xl font-bold text-gray-900" data-mock="true">TaskFlow</div>
+                                            <div class="hidden md:flex items-center space-x-8">
+                                                <a href="#" class="text-gray-600 hover:text-gray-900" data-mock="true">Features</a>
+                                                <a href="#" class="text-gray-600 hover:text-gray-900" data-mock="true">Pricing</a>
+                                                <a href="#" class="text-gray-600 hover:text-gray-900" data-mock="true">About</a>
+                                                <button class="bg-primary text-white px-4 py-2 rounded-lg" data-mock="true">Sign Up</button>
+                                            </div>
+                                        </nav>
+                                        <div class="text-center">
+                                            <h1 class="text-5xl font-bold text-gray-900 mb-6" data-mock="true">
+                                                Streamline Your Remote Team's Workflow
+                                            </h1>
+                                            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto" data-mock="true">
+                                                TaskFlow empowers remote teams with real-time collaboration, automated workflows, and powerful analytics to boost productivity and deliver results faster.
+                                            </p>
+                                            <div class="flex items-center justify-center space-x-4">
+                                                <button class="bg-primary text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition-colors" data-mock="true">
+                                                    Start Free Trial
+                                                </button>
+                                                <button class="text-primary px-8 py-3 text-lg font-semibold hover:text-blue-600 transition-colors" data-mock="true">
+                                                    Watch Demo
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Features Section Preview -->
+                                <div class="py-16 px-8">
+                                    <div class="max-w-6xl mx-auto">
+                                        <h2 class="text-3xl font-bold text-center text-gray-900 mb-12" data-mock="true">
+                                            Everything You Need to Succeed
+                                        </h2>
+                                        <div class="grid md:grid-cols-3 gap-8">
+                                            <div class="text-center" data-mock="true">
+                                                <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                                                    <i class="fas fa-users text-2xl text-primary"></i>
+                                                </div>
+                                                <h3 class="text-xl font-semibold mb-2">Real-time Collaboration</h3>
+                                                <p class="text-gray-600">Work together seamlessly with instant updates and team sync</p>
+                                            </div>
+                                            <div class="text-center" data-mock="true">
+                                                <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                                                    <i class="fas fa-cogs text-2xl text-primary"></i>
+                                                </div>
+                                                <h3 class="text-xl font-semibold mb-2">Automated Workflows</h3>
+                                                <p class="text-gray-600">Streamline repetitive tasks with smart automation</p>
+                                            </div>
+                                            <div class="text-center" data-mock="true">
+                                                <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                                                    <i class="fas fa-chart-bar text-2xl text-primary"></i>
+                                                </div>
+                                                <h3 class="text-xl font-semibold mb-2">Analytics Dashboard</h3>
+                                                <p class="text-gray-600">Get insights into team performance and project progress</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pricing Section Preview -->
+                                <div class="bg-gray-50 py-16 px-8">
+                                    <div class="max-w-4xl mx-auto">
+                                        <h2 class="text-3xl font-bold text-center text-gray-900 mb-12" data-mock="true">
+                                            Simple, Transparent Pricing
+                                        </h2>
+                                        <div class="grid md:grid-cols-3 gap-8">
+                                            <div class="bg-white rounded-lg p-6 shadow-sm" data-mock="true">
+                                                <h3 class="text-xl font-semibold mb-2">Free</h3>
+                                                <div class="text-3xl font-bold mb-4">$0<span class="text-lg text-gray-500">/month</span></div>
+                                                <ul class="space-y-2 text-sm text-gray-600 mb-6">
+                                                    <li>• Up to 3 team members</li>
+                                                    <li>• Basic workflows</li>
+                                                    <li>• Community support</li>
+                                                </ul>
+                                                <button class="w-full bg-gray-100 text-gray-800 py-2 rounded-lg">Get Started</button>
+                                            </div>
+                                            <div class="bg-white rounded-lg p-6 shadow-lg border-2 border-primary" data-mock="true">
+                                                <h3 class="text-xl font-semibold mb-2">Pro</h3>
+                                                <div class="text-3xl font-bold mb-4">$29<span class="text-lg text-gray-500">/month</span></div>
+                                                <ul class="space-y-2 text-sm text-gray-600 mb-6">
+                                                    <li>• Unlimited team members</li>
+                                                    <li>• Advanced automation</li>
+                                                    <li>• Priority support</li>
+                                                </ul>
+                                                <button class="w-full bg-primary text-white py-2 rounded-lg">Start Trial</button>
+                                            </div>
+                                            <div class="bg-white rounded-lg p-6 shadow-sm" data-mock="true">
+                                                <h3 class="text-xl font-semibold mb-2">Enterprise</h3>
+                                                <div class="text-3xl font-bold mb-4">$99<span class="text-lg text-gray-500">/month</span></div>
+                                                <ul class="space-y-2 text-sm text-gray-600 mb-6">
+                                                    <li>• Custom integrations</li>
+                                                    <li>• Advanced analytics</li>
+                                                    <li>• Dedicated support</li>
+                                                </ul>
+                                                <button class="w-full bg-gray-800 text-white py-2 rounded-lg">Contact Sales</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: PreviewPanel -->
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: AppLayout -->
+
+    <!-- Code View Modal (Hidden by default) -->
+    <!-- @COMPONENT: CodeModal -->
+    <div id="codeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" data-event="click:closeModal">
+        <div class="bg-white rounded-lg w-full max-w-6xl h-5/6 mx-4 flex flex-col" onclick="event.stopPropagation()">
+            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-gray-900">Generated Code</h2>
+                <div class="flex items-center space-x-2">
+                    <select class="border border-gray-300 rounded px-3 py-1 text-sm">
+                        <option>HTML</option>
+                        <option>CSS</option>
+                        <option>JavaScript</option>
+                    </select>
+                    <button data-event="click:copyCode" class="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-copy mr-1"></i>
+                        Copy
+                    </button>
+                    <button data-event="click:closeModal" class="p-1 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 p-4 overflow-hidden">
+                <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg h-full overflow-auto text-sm font-mono" data-mock="true">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;TaskFlow - Project Management for Remote Teams&lt;/title&gt;
+    &lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="bg-gradient-to-br from-blue-50 to-white px-8 py-12"&gt;
+        &lt;div class="max-w-6xl mx-auto"&gt;
+            &lt;nav class="flex items-center justify-between mb-12"&gt;
+                &lt;div class="text-2xl font-bold text-gray-900"&gt;TaskFlow&lt;/div&gt;
+                &lt;div class="hidden md:flex items-center space-x-8"&gt;
+                    &lt;a href="#" class="text-gray-600 hover:text-gray-900"&gt;Features&lt;/a&gt;
+                    &lt;a href="#" class="text-gray-600 hover:text-gray-900"&gt;Pricing&lt;/a&gt;
+                    &lt;a href="#" class="text-gray-600 hover:text-gray-900"&gt;About&lt;/a&gt;
+                    &lt;button class="bg-blue-600 text-white px-4 py-2 rounded-lg"&gt;Sign Up&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/nav&gt;
+            ...
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: CodeModal -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        
+        (function() {
+            // Chat functionality
+            function initializeChat() {
+                const chatInput = document.querySelector('input[data-event*="handleEnter"]');
+                const sendButton = document.querySelector('button[data-event*="sendMessage"]');
+                
+                if (chatInput) {
+                    chatInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            // TODO: Send message to AI API
+                            console.log('Sending message:', this.value);
+                            this.value = '';
+                        }
+                    });
+                }
+                
+                if (sendButton) {
+                    sendButton.addEventListener('click', function() {
+                        // TODO: Send message to AI API
+                        console.log('Send button clicked');
+                    });
+                }
+            }
+            
+            // Code modal functionality
+            function initializeCodeModal() {
+                const modal = document.getElementById('codeModal');
+                const viewCodeBtn = document.querySelector('button[data-event*="viewCode"]');
+                const closeModalBtns = document.querySelectorAll('button[data-event*="closeModal"]');
+                
+                if (viewCodeBtn && modal) {
+                    viewCodeBtn.addEventListener('click', function() {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    });
+                }
+                
+                closeModalBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                    });
+                });
+                
+                if (modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                    });
+                }
+            }
+            
+            // Device preview toggle
+            function initializeDeviceToggle() {
+                const deviceButtons = document.querySelectorAll('button[data-event*="setDevice"]');
+                deviceButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Remove active state from all buttons
+                        deviceButtons.forEach(b => {
+                            b.classList.remove('bg-white', 'shadow-sm');
+                            b.classList.add('text-gray-600');
+                        });
+                        
+                        // Add active state to clicked button
+                        this.classList.add('bg-white', 'shadow-sm');
+                        this.classList.remove('text-gray-600');
+                        
+                        // TODO: Adjust preview panel size based on device
+                        const device = this.getAttribute('data-event').split(':')[2];
+                        console.log('Switching to device:', device);
+                    });
+                });
+            }
+            
+            // Initialize all functionality
+            initializeChat();
+            initializeCodeModal();
+            initializeDeviceToggle();
+            
+            // Auto-scroll chat to bottom
+            const chatContainer = document.querySelector('.overflow-y-auto');
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ChevronRight, ChevronDown, File, Folder, FolderOpen, Search, Download } from "lucide-react";
+import { ChevronRight, ChevronDown, File, Folder, FolderOpen, Search, Download, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
 
@@ -17,24 +18,73 @@ export default function FileExplorer() {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['src', 'components']));
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
   });
 
-  // Get the most recently created project (your uploaded NextJS project)
-  const currentProject = projects.length > 1 
-    ? projects[projects.length - 1] // Most recent project
-    : projects[0]; // Fallback to first if only one
+  // Sort projects by creation date (newest first) and get the most recent one with actual codebase
+  const sortedProjects = projects
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    })
+    .filter(p => p.codebase && p.codebase !== null); // Only projects with uploaded codebase
+    
+  // Get the current project - either selected manually or most recent
+  const currentProject = selectedProjectId 
+    ? sortedProjects.find(p => p.id === selectedProjectId) || sortedProjects[0]
+    : sortedProjects[0]; // Default to most recent project with codebase
+  
+  // Debug logging to help troubleshoot
+  console.log('All projects:', projects);
+  console.log('Projects with codebase:', sortedProjects);
+  console.log('Current project selected:', currentProject);
+  console.log('Current project codebase type:', typeof currentProject?.codebase);
+  
+  if (currentProject?.codebase) {
+    console.log('Codebase preview:', 
+      typeof currentProject.codebase === 'string' 
+        ? currentProject.codebase.substring(0, 200) + '...'
+        : currentProject.codebase
+    );
+  }
   
   // Parse codebase into file structure - this will show your real uploaded files!
   const parseCodebase = (codebase: any): FileNode[] => {
-    if (!codebase) return getDefaultFileStructure();
+    console.log('🔍 Parsing codebase, type:', typeof codebase);
+    console.log('🔍 Codebase content preview:', 
+      typeof codebase === 'string' ? codebase.substring(0, 500) + '...' : codebase
+    );
+    
+    if (!codebase) {
+      console.log('❌ No codebase provided, using default structure');
+      return getDefaultFileStructure();
+    }
     
     try {
-      // Handle different codebase formats
+      // Handle structured codebase from ZIP upload
+      if (typeof codebase === 'string') {
+        try {
+          const parsed = JSON.parse(codebase);
+          if (parsed.type === 'zip' && parsed.files) {
+            console.log('Found ZIP structure with files:', Object.keys(parsed.files));
+            console.log('Total files found:', Object.keys(parsed.files).length);
+            const fileTree = buildFileTree(Object.keys(parsed.files));
+            console.log('Generated file tree:', fileTree);
+            return fileTree;
+          }
+        } catch (e) {
+          console.log('Failed to parse JSON codebase, trying text parsing:', e);
+          // Not JSON, continue with text parsing
+        }
+      }
+      
+      // Handle direct object with files property
       if (typeof codebase === 'object' && codebase.files) {
-        // If codebase has a files property, use it directly
+        console.log('Found object structure with files:', Object.keys(codebase.files));
         return buildFileTree(Object.keys(codebase.files));
       }
       
@@ -78,8 +128,8 @@ export default function FileExplorer() {
           ];
           
           patterns.forEach(pattern => {
-            const matches = line.matchAll(pattern);
-            for (const match of matches) {
+            let match;
+            while ((match = pattern.exec(line)) !== null) {
               let filePath = match[1] || match[0];
               if (filePath && !filePath.startsWith('http') && !filePath.startsWith('//')) {
                 filePath = filePath.replace(/^\.\//, '').replace(/\\/g, '/');
@@ -87,6 +137,8 @@ export default function FileExplorer() {
                   files.add(filePath);
                 }
               }
+              // Prevent infinite loop for global patterns
+              if (!pattern.global) break;
             }
           });
         });
@@ -167,26 +219,29 @@ export default function FileExplorer() {
     return root.length > 0 ? root : getDefaultFileStructure();
   };
 
-  const getDefaultFileStructure = (): FileNode[] => [
-    {
-      name: 'src',
-      type: 'folder',
-      children: [
-        {
-          name: 'components',
-          type: 'folder',
-          children: [
-            { name: 'Header.tsx', type: 'file', size: '2.1KB', modified: '2 mins ago' },
-            { name: 'Navigation.tsx', type: 'file', size: '1.8KB', modified: '5 mins ago' },
-            { name: 'SearchBar.tsx', type: 'file', size: '1.2KB', modified: '10 mins ago' },
-          ]
-        },
-        { name: 'App.tsx', type: 'file', size: '0.8KB', modified: '1 week ago' },
-      ]
-    },
-    { name: 'package.json', type: 'file', size: '1.2KB', modified: '1 week ago' },
-    { name: 'tsconfig.json', type: 'file', size: '0.5KB', modified: '1 week ago' },
-  ];
+  const getDefaultFileStructure = (): FileNode[] => {
+    console.log('⚠️  Falling back to default file structure - this means ZIP parsing failed');
+    return [
+      {
+        name: 'src',
+        type: 'folder',
+        children: [
+          {
+            name: 'components',
+            type: 'folder',
+            children: [
+              { name: 'Header.tsx', type: 'file', size: '2.1KB', modified: '2 mins ago' },
+              { name: 'Navigation.tsx', type: 'file', size: '1.8KB', modified: '5 mins ago' },
+              { name: 'SearchBar.tsx', type: 'file', size: '1.2KB', modified: '10 mins ago' },
+            ]
+          },
+          { name: 'App.tsx', type: 'file', size: '0.8KB', modified: '1 week ago' },
+        ]
+      },
+      { name: 'package.json', type: 'file', size: '1.2KB', modified: '1 week ago' },
+      { name: 'tsconfig.json', type: 'file', size: '0.5KB', modified: '1 week ago' },
+    ];
+  };
 
   // Get file structure from uploaded project
   const fileStructure = currentProject?.codebase 
@@ -290,12 +345,42 @@ export default function FileExplorer() {
           <Button
             variant="outline"
             size="sm"
-            data-testid="button-download-project"
+            className="text-xs"
+            data-testid="download-project"
           >
-            <Download size={16} className="mr-2" />
-            Download
+            <Download size={14} className="mr-1" />
+            Export
           </Button>
         </div>
+
+        {/* Project Selector */}
+        {sortedProjects.length > 1 && (
+          <div className="mb-3">
+            <label className="text-xs font-medium text-gray-700 mb-1 block">
+              Select Project to View:
+            </label>
+            <Select
+              value={selectedProjectId || currentProject?.id || ""}
+              onValueChange={setSelectedProjectId}
+            >
+              <SelectTrigger className="w-full text-sm">
+                <SelectValue placeholder="Choose project..." />
+              </SelectTrigger>
+              <SelectContent>
+                {sortedProjects.map((project) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{project.name}</span>
+                      <span className="text-xs text-gray-500">
+                        {project.framework} • {new Date(project.createdAt || '').toLocaleDateString()}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         
         {/* Search */}
         <div className="relative">

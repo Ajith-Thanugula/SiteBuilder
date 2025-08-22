@@ -1,0 +1,456 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCraft AI - Build Websites with AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0070f3',
+                        secondary: '#7c3aed',
+                        accent: '#10b981',
+                        dark: '#0f172a',
+                        'dark-secondary': '#1e293b',
+                        'dark-tertiary': '#334155'
+                    },
+                    fontFamily: {
+                        'mono': ['JetBrains Mono', 'monospace'],
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- @COMPONENT: TopNavigation -->
+    <nav class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-magic text-white text-sm"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">WebCraft AI</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 ml-8">
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Dashboard</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Projects</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Templates</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors">Documentation</a>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="p-2 text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                    <!-- Profile photo placeholder -->
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32" alt="User profile" class="w-8 h-8 rounded-full" data-mock="true">
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: TopNavigation -->
+
+    <div class="flex h-screen">
+        <!-- @COMPONENT: Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-6">
+                <button class="w-full bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span>New Project</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 px-6">
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">Current Project</h3>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                                <i class="fas fa-react text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900" data-bind="project.name">E-commerce App</h4>
+                                <p class="text-sm text-gray-500" data-bind="project.framework">Next.js + Tailwind</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Progress</span>
+                                <span class="text-gray-900 font-medium">78%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-accent h-2 rounded-full" style="width: 78%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">Workflow Steps</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-3 p-3 rounded-lg bg-green-50 border border-green-200">
+                            <div class="w-6 h-6 bg-accent rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span class="text-sm text-green-800">Upload Codebase</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                            <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
+                            <span class="text-sm text-blue-800">Design Input</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
+                            <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-bold">3</div>
+                            <span class="text-sm text-gray-600">AI Analysis</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
+                            <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-bold">4</div>
+                            <span class="text-sm text-gray-600">Code Generation</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
+                            <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-bold">5</div>
+                            <span class="text-sm text-gray-600">Review & Apply</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">Recent Projects</h3>
+                    <div class="space-y-2">
+                        <!-- @MAP: recentProjects.map(project => ( -->
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-code text-secondary text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900" data-mock="true">Portfolio Site</p>
+                                <p class="text-xs text-gray-500" data-mock="true">2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-mobile-alt text-accent text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900" data-mock="true">Mobile App</p>
+                                <p class="text-xs text-gray-500" data-mock="true">1 day ago</p>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainContent -->
+        <main class="flex-1 overflow-hidden">
+            <div class="h-full flex flex-col">
+                <!-- Tab Navigation -->
+                <div class="bg-white border-b border-gray-200 px-6">
+                    <div class="flex space-x-8">
+                        <button class="py-4 px-1 border-b-2 border-primary text-primary font-medium text-sm">
+                            Design Input
+                        </button>
+                        <button class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
+                            Code Preview
+                        </button>
+                        <button class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
+                            Live Preview
+                        </button>
+                        <button class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">
+                            File Explorer
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full flex">
+                        <!-- Left Panel - Input Section -->
+                        <div class="w-1/2 border-r border-gray-200 bg-white flex flex-col">
+                            <div class="p-6 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-900 mb-2">Describe Your Changes</h2>
+                                <p class="text-sm text-gray-600">Tell us what you want to modify, add, or improve in your application.</p>
+                            </div>
+                            
+                            <div class="flex-1 p-6 overflow-y-auto">
+                                <!-- Description Input -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Description</label>
+                                    <textarea 
+                                        class="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                                        placeholder="I want to update the header navigation to include a search bar and user avatar dropdown. The search should be prominently displayed in the center..."
+                                        data-mock="true"
+                                    ></textarea>
+                                </div>
+
+                                <!-- File Upload Section -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Resources</label>
+                                    <div class="space-y-3">
+                                        <!-- Figma Link -->
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Figma Design Link</label>
+                                            <input 
+                                                type="url" 
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                                                placeholder="https://figma.com/file/..."
+                                                data-mock="true"
+                                            />
+                                        </div>
+
+                                        <!-- Screenshot Upload -->
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Screenshots/References</label>
+                                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer">
+                                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                                                <p class="text-sm text-gray-600">Drop screenshots here or click to upload</p>
+                                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Component Selection -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Target Components</label>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-sm font-medium text-gray-700">Select components to modify:</span>
+                                            <button class="text-xs text-primary hover:text-blue-700">Select All</button>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <!-- @MAP: components.map(component => ( -->
+                                            <label class="flex items-center space-x-3 cursor-pointer">
+                                                <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary" checked data-mock="true" />
+                                                <div class="flex items-center space-x-2">
+                                                    <i class="fas fa-file-code text-gray-400"></i>
+                                                    <span class="text-sm text-gray-700" data-mock="true">Header.tsx</span>
+                                                </div>
+                                            </label>
+                                            <label class="flex items-center space-x-3 cursor-pointer">
+                                                <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary" data-mock="true" />
+                                                <div class="flex items-center space-x-2">
+                                                    <i class="fas fa-file-code text-gray-400"></i>
+                                                    <span class="text-sm text-gray-700" data-mock="true">Navigation.tsx</span>
+                                                </div>
+                                            </label>
+                                            <label class="flex items-center space-x-3 cursor-pointer">
+                                                <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary" data-mock="true" />
+                                                <div class="flex items-center space-x-2">
+                                                    <i class="fas fa-file-code text-gray-400"></i>
+                                                    <span class="text-sm text-gray-700" data-mock="true">SearchBar.tsx</span>
+                                                </div>
+                                            </label>
+                                            <!-- @END_MAP )) -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex space-x-3">
+                                    <button class="flex-1 bg-primary text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                                        <i class="fas fa-magic"></i>
+                                        <span>Generate Preview</span>
+                                    </button>
+                                    <button class="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel - AI Interaction & Preview -->
+                        <div class="w-1/2 bg-gray-50 flex flex-col">
+                            <!-- AI Chat Header -->
+                            <div class="p-6 bg-white border-b border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                                        <i class="fas fa-robot text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900">AI Assistant</h3>
+                                        <p class="text-sm text-gray-600">Ask questions or request clarifications</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chat Messages -->
+                            <div class="flex-1 p-6 overflow-y-auto">
+                                <div class="space-y-4">
+                                    <!-- AI Message -->
+                                    <div class="flex space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-robot text-white text-xs"></i>
+                                        </div>
+                                        <div class="bg-white rounded-lg p-4 shadow-sm max-w-md">
+                                            <p class="text-sm text-gray-800" data-mock="true">I've analyzed your existing codebase. I see you want to update the header navigation. I have a few questions to better understand your requirements:</p>
+                                            <div class="mt-3 space-y-2">
+                                                <div class="text-sm">
+                                                    <p class="font-medium text-gray-700" data-mock="true">1. Search Functionality:</p>
+                                                    <p class="text-gray-600" data-mock="true">Should the search include autocomplete suggestions?</p>
+                                                </div>
+                                                <div class="text-sm">
+                                                    <p class="font-medium text-gray-700" data-mock="true">2. User Avatar:</p>
+                                                    <p class="text-gray-600" data-mock="true">What options should appear in the dropdown menu?</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- User Message -->
+                                    <div class="flex space-x-3 justify-end">
+                                        <div class="bg-primary rounded-lg p-4 shadow-sm max-w-md">
+                                            <p class="text-sm text-white" data-mock="true">Yes, include autocomplete for search. For the avatar dropdown, add Profile, Settings, and Logout options.</p>
+                                        </div>
+                                        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <!-- User avatar -->
+                                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32" alt="User" class="w-8 h-8 rounded-full" data-mock="true">
+                                        </div>
+                                    </div>
+
+                                    <!-- AI Response with Code Preview -->
+                                    <div class="flex space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-robot text-white text-xs"></i>
+                                        </div>
+                                        <div class="bg-white rounded-lg p-4 shadow-sm max-w-full">
+                                            <p class="text-sm text-gray-800 mb-3" data-mock="true">Perfect! I'll generate the updated header component with search autocomplete and user dropdown. Here's a preview:</p>
+                                            
+                                            <!-- Code Preview -->
+                                            <div class="bg-dark rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                                                <div class="text-gray-300">
+                                                    <span class="text-purple-400">const</span> <span class="text-blue-400">Header</span> = () => {<br/>
+                                                    &nbsp;&nbsp;<span class="text-purple-400">return</span> (<br/>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="text-red-400">header</span> <span class="text-green-400">className</span>=<span class="text-yellow-400">"nav-header"</span>&gt;<br/>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="text-red-400">SearchBar</span> <span class="text-green-400">withAutocomplete</span> /&gt;<br/>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="text-red-400">UserDropdown</span> <span class="text-green-400">options</span>=<span class="text-yellow-400">{['Profile', 'Settings', 'Logout']}</span> /&gt;<br/>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="text-red-400">header</span>&gt;<br/>
+                                                    &nbsp;&nbsp;)<br/>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3 flex space-x-2">
+                                                <button class="bg-accent text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-green-600 transition-colors">
+                                                    Apply Changes
+                                                </button>
+                                                <button class="border border-gray-300 text-gray-700 px-3 py-1.5 rounded text-xs font-medium hover:bg-gray-50 transition-colors">
+                                                    View Diff
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chat Input -->
+                            <div class="p-4 bg-white border-t border-gray-200">
+                                <div class="flex space-x-2">
+                                    <input 
+                                        type="text" 
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                                        placeholder="Ask a question or provide feedback..."
+                                        data-mock="true"
+                                    />
+                                    <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+    </div>
+
+    <!-- @COMPONENT: StatusBar -->
+    <div class="bg-dark text-white px-6 py-2 text-sm">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <span class="text-green-400">● Connected to OpenAI API</span>
+                <span class="text-gray-400">|</span>
+                <span data-bind="status.componentsAnalyzed" data-mock="true">23 components analyzed</span>
+                <span class="text-gray-400">|</span>
+                <span data-bind="status.lastUpdate" data-mock="true">Last update: 2 minutes ago</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                    <span class="text-sm">Processing...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: StatusBar -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        
+        (function() {
+            // Demo interactive functionality for tabs
+            const tabButtons = document.querySelectorAll('[role="tab"]');
+            
+            // Demo chat functionality
+            const chatInput = document.querySelector('input[placeholder*="Ask a question"]');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && this.value.trim()) {
+                        // TODO: Implement chat message sending
+                        console.log('Send message:', this.value);
+                        this.value = '';
+                    }
+                });
+            }
+
+            // Demo file upload interaction
+            const uploadArea = document.querySelector('.border-dashed');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('border-primary', 'bg-blue-50');
+                });
+                
+                uploadArea.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('border-primary', 'bg-blue-50');
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('border-primary', 'bg-blue-50');
+                    // TODO: Handle file upload
+                    console.log('Files dropped:', e.dataTransfer.files);
+                });
+            }
+
+            // Demo progress animation
+            const progressBar = document.querySelector('.bg-accent');
+            if (progressBar) {
+                setInterval(() => {
+                    const currentWidth = parseInt(progressBar.style.width) || 78;
+                    const newWidth = Math.min(currentWidth + Math.random() * 2, 85);
+                    progressBar.style.width = newWidth + '%';
+                    
+                    const percentageDisplay = document.querySelector('span:contains("78%")');
+                    if (percentageDisplay) {
+                        percentageDisplay.textContent = Math.round(newWidth) + '%';
+                    }
+                }, 3000);
+            }
+        })();
+    </script>
+</body>
+</html>

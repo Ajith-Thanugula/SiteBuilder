@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
+import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,11 +76,88 @@ export default function NewProjectDialog({ children }: NewProjectDialogProps) {
     
     if (codebaseFile) {
       try {
-        codebaseContent = await codebaseFile.text();
+        if (codebaseFile.name.endsWith('.zip')) {
+          // Use JSZip to extract real ZIP file contents
+          const zip = new JSZip();
+          const zipData = await codebaseFile.arrayBuffer();
+          const zipContents = await zip.loadAsync(zipData);
+          
+          const files: Record<string, string> = {};
+          const promises: Promise<void>[] = [];
+          
+          // Extract all files from the ZIP
+          zipContents.forEach((relativePath, file) => {
+            if (!file.dir) { // Only process files, not directories
+              promises.push(
+                file.async("text").then((content) => {
+                  // Clean up the file path - specifically handle 'replit/' folder
+                  let cleanPath = relativePath;
+                  
+                  // If file is inside 'replit/' folder, move it to root level
+                  if (cleanPath.startsWith('replit/')) {
+                    cleanPath = cleanPath.replace(/^replit\//, '');
+                  }
+                  
+                  // Remove any other wrapper folders that might contain the main project
+                  const pathParts = cleanPath.split('/');
+                  if (pathParts.length > 1) {
+                    // Check if this looks like an extracted project folder that should be flattened
+                    const possibleProjectFolders = ['project', 'app', 'main', 'source'];
+                    if (possibleProjectFolders.includes(pathParts[0].toLowerCase()) && pathParts.length > 2) {
+                      // Remove the first folder level if it's likely a project wrapper folder
+                      cleanPath = pathParts.slice(1).join('/');
+                    }
+                  }
+                  
+                  // Only add non-empty paths
+                  if (cleanPath && cleanPath.trim()) {
+                    files[cleanPath] = content;
+                  }
+                }).catch((error) => {
+                  console.warn(`Failed to read file ${relativePath}:`, error);
+                })
+              );
+            }
+          });
+          
+          await Promise.all(promises);
+          
+          codebaseContent = JSON.stringify({
+            type: 'zip',
+            name: codebaseFile.name,
+            size: codebaseFile.size,
+            lastModified: codebaseFile.lastModified,
+            files: files,
+            fileCount: Object.keys(files).length
+          });
+          
+          console.log('✅ Successfully extracted ZIP with', Object.keys(files).length, 'files');
+          console.log('📁 Sample cleaned file paths:');
+          Object.keys(files).slice(0, 15).forEach(path => {
+            console.log('  -', path);
+          });
+          
+          // Show root level files
+          const rootFiles = Object.keys(files).filter(path => !path.includes('/'));
+          console.log('📄 Root level files:', rootFiles);
+          
+        } else {
+          // For text files, read the actual content
+          codebaseContent = await codebaseFile.text();
+        }
+        
+        console.log('Uploading project with codebase:', { 
+          name: data.name, 
+          fileName: codebaseFile.name, 
+          fileSize: codebaseFile.size,
+          codebaseLength: codebaseContent.length 
+        });
+        
       } catch (error) {
+        console.error('Error processing file:', error);
         toast({
           title: "File upload error",
-          description: "Failed to read codebase file",
+          description: `Failed to process ${codebaseFile.name}: ${(error as Error).message}`,
           variant: "destructive",
         });
         return;
